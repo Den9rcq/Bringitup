@@ -6,7 +6,7 @@ export default class Slider {
 		this.slideIndex = 1;
 	}
 
-	// Показ слайда
+	// ~ Показ слайда
 	showSlides(n) {
 		if (n > this.slides.length) {
 			this.slideIndex = 1;
@@ -46,22 +46,19 @@ export default class Slider {
 		this.slides[this.slideIndex - 1].style.display = 'block';
 	}
 
-	// Изменение слайда
+	// ~ Изменение слайда
 	plusSlides(n) {
 		this.showSlides(this.slideIndex += n);
 	}
 
 
 
-
+	// & 
 	render() {
-
 		// Поиск элемента на странице, для его показа через 3 секунды
 		try {
 			this.hanson = document.querySelector('.hanson');
 		} catch (e) { }
-
-
 
 		// Меняем слайд нажатием на кнопку
 		this.btns.forEach(btn => {
