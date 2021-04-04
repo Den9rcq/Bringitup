@@ -1,8 +1,8 @@
 import Slider from './slider';
 
 export default class MainSlider extends Slider {
-    constructor(page, btns) {
-        super(page, btns);
+    constructor(btns) {
+        super(btns);
     }
 
     // ~ Показ слайда
@@ -33,12 +33,12 @@ export default class MainSlider extends Slider {
 
 
         // Скрываем все слайды
-        this.slides.forEach(slide => {
+        [...this.slides].forEach(slide => {                                 //^ [...] - Чтобы превратить HTMLCollection в массив 
             slide.style.display = 'none';
         });
 
         // for (let i = 0; i < this.slides.length; i++) {
-        // 	this.slides[i].style.display = 'none';
+        //     this.slides[i].style.display = 'none';
         // }
 
         // Показываем текущий слайд
