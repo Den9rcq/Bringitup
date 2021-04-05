@@ -1,22 +1,23 @@
 import Slider from './slider';
 
 export default class MainSlider extends Slider {
-    constructor(btns) {
-        super(btns);
+    constructor(btnNext, btnPrev) {
+        super(btnNext, btnPrev);
     }
 
     // ~ Показ слайда
     showSlides(n) {
-        if (n > this.slides.length) {
-            this.slideIndex = 1;
-        }
-
-        if (n < 1) {
-            this.slideIndex = this.slides.length;
-        }
-
-        // Показ блока через 3 секунды
         try {
+            if (n > this.slides.length) {
+                this.slideIndex = 1;
+            }
+
+            if (n < 1) {
+                this.slideIndex = this.slides.length;
+            }
+
+            // Показ блока через 3 секунды
+
             this.hanson.style.opacity = 0;
             if (n === 3) {
                 this.hanson.classList.add('animated');
@@ -51,18 +52,11 @@ export default class MainSlider extends Slider {
     }
 
 
-
-    // & 
-    render() {
-        // Поиск элемента на странице, для его показа через 3 секунды
-        try {
-            this.hanson = document.querySelector('.hanson');
-        } catch (e) { }
-
+    bindTriggers(directionBtn, n) {
         // Меняем слайд нажатием на кнопку
-        this.btns.forEach(btn => {
+        directionBtn.forEach(btn => {
             btn.addEventListener('click', () => {
-                this.plusSlides(1);
+                this.plusSlides(n);
             });
 
             // Переходим к первому слайду, нажатием на логотип
@@ -73,9 +67,23 @@ export default class MainSlider extends Slider {
                 this.showSlides(this.slideIndex);
             });
         });
+    }
 
 
-        // Первичная иницилизация
-        this.showSlides(this.slideIndex);
+    // & 
+    render() {
+        if (this.container) {
+            // Поиск элемента на странице, для его показа через 3 секунды
+            try {
+                this.hanson = document.querySelector('.hanson');
+            } catch (e) { }
+
+            // Перелистование слайдера
+            this.bindTriggers(this.btnNext, 1);
+            this.bindTriggers(this.btnPrev, -1);
+
+            // Первичная иницилизация
+            this.showSlides(this.slideIndex);
+        }
     }
 }

@@ -99,16 +99,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/slider/slider-mini */ "./src/js/modules/slider/slider-mini.js");
 /* harmony import */ var _modules_playVideo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/playVideo */ "./src/js/modules/playVideo.js");
 /* harmony import */ var _modules_difference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/difference */ "./src/js/modules/difference.js");
+/* harmony import */ var _modules_form__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/form */ "./src/js/modules/form.js");
+
 
 
 
 
 window.addEventListener('DOMContentLoaded', () => {
   const slider = new _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_0__["default"]({
-    btns: '.next',
+    btnNext: '.next',
     container: '.page'
   });
   slider.render();
+  const modulePageSlider = new _modules_slider_slider_main__WEBPACK_IMPORTED_MODULE_0__["default"]({
+    container: '.moduleapp',
+    btnNext: '.next',
+    btnPrev: '.prev'
+  });
+  modulePageSlider.render();
   const showUpSlider = new _modules_slider_slider_mini__WEBPACK_IMPORTED_MODULE_1__["default"]({
     container: '.showup__content-slider',
     prev: '.showup__prev',
@@ -139,6 +147,7 @@ window.addEventListener('DOMContentLoaded', () => {
   officerOld.init();
   const officerNew = new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"]('.officernew', '.officer__card-item');
   officerNew.init();
+  new _modules_form__WEBPACK_IMPORTED_MODULE_4__["default"]('.form').init();
 });
 
 /***/ }),
@@ -156,7 +165,11 @@ __webpack_require__.r(__webpack_exports__);
 class Difference {
   constructor(officer, items) {
     this.officer = document.querySelector(officer);
-    this.items = this.officer.querySelectorAll(items);
+
+    try {
+      this.items = this.officer.querySelectorAll(items);
+    } catch (e) {}
+
     this.counter = 0;
   }
 
@@ -184,8 +197,148 @@ class Difference {
   }
 
   init() {
-    this.hideCards();
-    this.bindTriggers();
+    try {
+      this.hideCards();
+      this.bindTriggers();
+    } catch (e) {}
+  }
+
+}
+
+/***/ }),
+
+/***/ "./src/js/modules/form.js":
+/*!********************************!*\
+  !*** ./src/js/modules/form.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Form; });
+class Form {
+  constructor(form) {
+    this.forms = document.querySelectorAll(form);
+    this.message = {
+      loading: 'Загрузка...',
+      success: 'Спасибо! Скоро мы с вами свяжемся',
+      failure: 'Что-то пошло не так...'
+    };
+    this.path = 'assets/question.php';
+  } // Запрос и обработка данных с сервера
+
+
+  async postResource(url, data) {
+    const res = await fetch(`${url}`, {
+      method: 'POST',
+      body: data
+    });
+
+    if (!res.ok) {
+      throw new Error(`Could not fetch: ${url}, status: ${res.status}`);
+    }
+
+    return await res.text();
+  } // Запрет ввода кириллицы в поле Email
+
+
+  chekTextInputs() {
+    const emailInputs = document.querySelectorAll('[type="email"]');
+    emailInputs.forEach(input => {
+      input.addEventListener('keypress', function (e) {
+        if (e.key.match(/[^a-z0-9@\.]/ig)) {
+          e.preventDefault();
+        }
+      });
+    });
+  } // Маска с номером телефона
+
+
+  mask() {
+    // Установка курсора
+    let setCursorPosition = (pos, elem) => {
+      elem.focus();
+
+      if (elem.setSelectionRange) {
+        elem.setSelectionRange(pos, pos); //^ Устанавливаем курсор после +7
+      } else if (elem.createTextRange) {
+        //^ Ручной полифил
+        let range = elem.createTextRange();
+        range.collapse(true); //^ Объединяет граничные точки деапозона
+
+        range.moveEnd('character', pos); //^ Конечная точка выделения
+
+        range.moveStart('character', pos); //^ Начальная точка выделения 
+
+        range.select(); //^ Устанавливаем курсор
+      }
+    }; // Масска номера телефона
+
+
+    function createMask(event) {
+      let matrix = '+1 (___) ___-____',
+          //^ Создаём маску
+      i = 0,
+          def = matrix.replace(/\D/g, ''),
+          //^ Статичная строка работает на основе matrix
+      val = this.value.replace(/\D/g, ''); //^ Динамичная строка на основе ввода пользователя
+
+      if (def.length >= val.length) {
+        //^ Непозволяем удалять +7
+        val = def;
+      }
+
+      this.value = matrix.replace(/./g, function (a) {
+        //!
+        return /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? '' : a;
+      }); // Скрытие маски, если пользователь ничего не ввёл и установка курсора
+
+      if (event.type === 'blur') {
+        if (this.value.length == 2) {
+          this.value = '';
+        }
+      } else {
+        setCursorPosition(this.value.length, this);
+      }
+    }
+
+    let inputs = document.querySelectorAll('[name=phone]');
+    inputs.forEach(input => {
+      input.addEventListener('input', createMask);
+      input.addEventListener('focus', createMask);
+      input.addEventListener('blur', createMask);
+    });
+  }
+
+  init() {
+    this.chekTextInputs();
+    this.mask();
+    this.forms.forEach(form => {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const statusMessage = document.createElement('div');
+        statusMessage.style.cssText = `
+                    display: flex;
+                    margin-top: 10px;
+                    color: red;
+                `;
+        form.parentNode.appendChild(statusMessage);
+        statusMessage.textContent = this.message.loading;
+        let formData = new FormData(form);
+        this.postResource(this.path, formData).then(data => {
+          console.log(data);
+          statusMessage.textContent = this.message.success;
+        }).catch(err => {
+          statusMessage.textContent = this.message.failure;
+        }).finally(() => {
+          form.reset();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 5000);
+        });
+      });
+    });
   }
 
 }
@@ -204,14 +357,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return VideoPlayer; });
 class VideoPlayer {
   constructor(triggers, overlay) {
-    this.btns = document.querySelectorAll(triggers);
+    this.btnNext = document.querySelectorAll(triggers);
     this.overlay = document.querySelector(overlay);
     this.close = this.overlay.querySelector('.close');
   } // Открытие модального окна и создание плеера
 
 
   bindTriggers() {
-    this.btns.forEach(btn => {
+    this.btnNext.forEach(btn => {
       btn.addEventListener('click', () => {
         if (document.querySelector('iframe#frame')) {
           this.overlay.style.display = 'flex'; //^ Показываем overlay
@@ -271,22 +424,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./slider */ "./src/js/modules/slider/slider.js");
 
 class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
-  constructor(btns) {
-    super(btns);
+  constructor(btnNext, btnPrev) {
+    super(btnNext, btnPrev);
   } // ~ Показ слайда
 
 
   showSlides(n) {
-    if (n > this.slides.length) {
-      this.slideIndex = 1;
-    }
-
-    if (n < 1) {
-      this.slideIndex = this.slides.length;
-    } // Показ блока через 3 секунды
-
-
     try {
+      if (n > this.slides.length) {
+        this.slideIndex = 1;
+      }
+
+      if (n < 1) {
+        this.slideIndex = this.slides.length;
+      } // Показ блока через 3 секунды
+
+
       this.hanson.style.opacity = 0;
 
       if (n === 3) {
@@ -315,19 +468,13 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
   plusSlides(n) {
     this.showSlides(this.slideIndex += n);
-  } // & 
+  }
 
-
-  render() {
-    // Поиск элемента на странице, для его показа через 3 секунды
-    try {
-      this.hanson = document.querySelector('.hanson');
-    } catch (e) {} // Меняем слайд нажатием на кнопку
-
-
-    this.btns.forEach(btn => {
+  bindTriggers(directionBtn, n) {
+    // Меняем слайд нажатием на кнопку
+    directionBtn.forEach(btn => {
       btn.addEventListener('click', () => {
-        this.plusSlides(1);
+        this.plusSlides(n);
       }); // Переходим к первому слайду, нажатием на логотип
 
       btn.parentNode.previousElementSibling.addEventListener('click', e => {
@@ -335,9 +482,23 @@ class MainSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.slideIndex = 1;
         this.showSlides(this.slideIndex);
       });
-    }); // Первичная иницилизация
+    });
+  } // & 
 
-    this.showSlides(this.slideIndex);
+
+  render() {
+    if (this.container) {
+      // Поиск элемента на странице, для его показа через 3 секунды
+      try {
+        this.hanson = document.querySelector('.hanson');
+      } catch (e) {} // Перелистование слайдера
+
+
+      this.bindTriggers(this.btnNext, 1);
+      this.bindTriggers(this.btnPrev, -1); // Первичная иницилизация
+
+      this.showSlides(this.slideIndex);
+    }
   }
 
 }
@@ -426,18 +587,20 @@ class MiniSlider extends _slider__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   init() {
-    this.container.style.cssText = `
+    try {
+      this.container.style.cssText = `
             display: flex;
             flex-wrap: wrap;
             overflow: hidden;
             align-items: flex-start;
         `;
-    this.bindTriggers();
-    this.decorizeSlides();
+      this.bindTriggers();
+      this.decorizeSlides();
 
-    if (this.autoplay) {
-      this.stopPlaySlide();
-    }
+      if (this.autoplay) {
+        this.stopPlaySlide();
+      }
+    } catch (e) {}
   }
 
 }
@@ -457,7 +620,8 @@ __webpack_require__.r(__webpack_exports__);
 class Slider {
   constructor({
     container = null,
-    btns = null,
+    btnNext = null,
+    btnPrev = null,
     next = null,
     prev = null,
     activeClass = "",
@@ -465,9 +629,14 @@ class Slider {
     autoplay
   } = {}) {
     this.container = document.querySelector(container);
-    this.slides = this.container.children; //^ Каждый блок внутри page
 
-    this.btns = document.querySelectorAll(btns);
+    try {
+      this.slides = this.container.children;
+    } catch (e) {} //^ Каждый блок внутри page
+
+
+    this.btnNext = document.querySelectorAll(btnNext);
+    this.btnPrev = document.querySelectorAll(btnPrev);
     this.prev = document.querySelector(prev);
     this.next = document.querySelector(next);
     this.activeClass = activeClass;

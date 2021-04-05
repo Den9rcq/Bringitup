@@ -6,10 +6,17 @@ import Form from './modules/form';
 
 window.addEventListener('DOMContentLoaded', () => {
     const slider = new MainSlider({
-        btns: '.next',
+        btnNext: '.next',
         container: '.page'
     });
     slider.render();
+
+    const modulePageSlider = new MainSlider({
+        container: '.moduleapp',
+        btnNext: '.next',
+        btnPrev: '.prev'
+    });
+    modulePageSlider.render();
 
     const showUpSlider = new MiniSlider({
         container: '.showup__content-slider',

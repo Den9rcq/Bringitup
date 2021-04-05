@@ -1,13 +1,13 @@
 export default class VideoPlayer {
     constructor(triggers, overlay) {
-        this.btns = document.querySelectorAll(triggers);
+        this.btnNext = document.querySelectorAll(triggers);
         this.overlay = document.querySelector(overlay);
         this.close = this.overlay.querySelector('.close');
     }
 
     // Открытие модального окна и создание плеера
     bindTriggers() {
-        this.btns.forEach(btn => {
+        this.btnNext.forEach(btn => {
             btn.addEventListener('click', () => {
 
                 if (document.querySelector('iframe#frame')) {
