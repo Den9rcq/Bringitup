@@ -100,6 +100,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_playVideo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/playVideo */ "./src/js/modules/playVideo.js");
 /* harmony import */ var _modules_difference__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/difference */ "./src/js/modules/difference.js");
 /* harmony import */ var _modules_form__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/form */ "./src/js/modules/form.js");
+/* harmony import */ var _modules_accordion__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/accordion */ "./src/js/modules/accordion.js");
+
 
 
 
@@ -148,7 +150,54 @@ window.addEventListener('DOMContentLoaded', () => {
   const officerNew = new _modules_difference__WEBPACK_IMPORTED_MODULE_3__["default"]('.officernew', '.officer__card-item');
   officerNew.init();
   new _modules_form__WEBPACK_IMPORTED_MODULE_4__["default"]('.form').init();
+  new _modules_accordion__WEBPACK_IMPORTED_MODULE_5__["default"]('.plus').init();
 });
+
+/***/ }),
+
+/***/ "./src/js/modules/accordion.js":
+/*!*************************************!*\
+  !*** ./src/js/modules/accordion.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Accordion; });
+class Accordion {
+  constructor(trigger) {
+    this.trigger = document.querySelectorAll(trigger);
+  } // Показ и скрытие сообщения
+
+
+  toggleMessage(message) {
+    message.classList.add('animated');
+
+    if (message.style.display !== 'flex') {
+      message.classList.remove('fadeOut');
+      message.classList.add('fadeIn');
+      message.style.display = 'flex';
+    } else {
+      message.classList.remove('fadeIn');
+      message.classList.add('fadeOut');
+      setTimeout(() => {
+        message.style.display = 'none';
+      }, 600);
+    }
+  }
+
+  init() {
+    // Событие при клике
+    this.trigger.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.message = btn.closest('.module__info-show').nextElementSibling;
+        this.toggleMessage(this.message);
+      });
+    });
+  }
+
+}
 
 /***/ }),
 
