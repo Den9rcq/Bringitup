@@ -1,6 +1,6 @@
 export default class Accordion {
-    constructor(trigger) {
-        this.trigger = document.querySelectorAll(trigger);
+    constructor(triggers) {
+        this.trigger = document.querySelectorAll(triggers);
     }
 
     // Показ и скрытие сообщения
